@@ -1,0 +1,24 @@
+.App {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.ItemCreator {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ItemCreator > label {
+  display: flex;
+  gap: .5rem;
+}
+
+.ItemCreator > .description, .ItemCreator > .description > input {
+  flex-grow: 1;
+}
+
+.ItemDisplay{}
