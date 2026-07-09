@@ -17,7 +17,7 @@
   gap: .5rem;
 }
 
-.ItemCreator > .description, .ItemCreator > .description > input {
+.ItemCreator > .notes, .ItemCreator > .notes > input {
   flex-grow: 1;
 }
 

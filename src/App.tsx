@@ -15,19 +15,19 @@ const ItemCreator: Component = () => {
   return (
     <form class={styles.ItemCreator}>
       <label>
+        Date
+        <input type="date" value={toDateInputValue(new Date())} required />
+      </label>
+      <label>
         Start
-        <input type="datetime-local" required />
+        <input type="time" required />
       </label>
       <label>
         End
-        <input type="datetime-local" required />
+        <input type="time" required />
       </label>
-      <label>
-        Task
-        <input type="url" />
-      </label>
-      <label class={styles.description}>
-        Description
+      <label class={styles.notes}>
+        Notes
         <input type="text" />
       </label>
       <button>Create</button>
@@ -43,8 +43,7 @@ const ItemDisplay: Component = () => {
           <th>Start</th>
           <th>End</th>
           <th>Duration</th>
-          <th>Task</th>
-          <th>Description</th>
+          <th>Notes</th>
         </tr>
       </thead>
       <tbody>
@@ -52,12 +51,17 @@ const ItemDisplay: Component = () => {
           <td>6/28/2026 11:00 AM</td>
           <td>6/28/2026 1:00 PM</td>
           <td>2:00</td>
-          <td>google.com/search?q=test</td>
           <td>for:Me,Test</td>
         </tr>
       </tbody>
     </table>
   )
 }
+
+function toDateInputValue(dateObject: Date){
+    const local = new Date(dateObject);
+    local.setMinutes(dateObject.getMinutes() - dateObject.getTimezoneOffset());
+    return local.toJSON().slice(0,10);
+};
 
 export default App
