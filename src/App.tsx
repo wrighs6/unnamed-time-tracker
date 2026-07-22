@@ -74,7 +74,9 @@ const ItemDisplay: Component<{ items: Item[] }> = ({ items }) => {
     const minutes = Math.floor((end.getTime() - start.getTime()) / 60000)
     const hours = Math.floor(minutes / 60)
 
-    return `${hours}:${minutes % 60}`
+    const minStr = (minutes % 60).toString().padStart(2, "0")
+
+    return `${hours}:${minStr}`
   }
 
   return (
