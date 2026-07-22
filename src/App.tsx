@@ -1,4 +1,4 @@
-import { For, type Component } from "solid-js"
+import { For, JSX, type Component } from "solid-js"
 
 import styles from "./App.module.css"
 import { createStore } from "solid-js/store"
@@ -10,40 +10,59 @@ type Item = {
 }
 
 export const App: Component = () => {
-  const [items, setItems] = createStore<Item[]>([{
-    start: new Date(2026, 7, 20, 10, 0, 0),
-    end: new Date(2026, 7, 20, 11, 30, 0),
-    notes: "Hello, world!"
-  }])
+  const [items, setItems] = createStore<Item[]>([])
 
   return (
     <div class={styles.App}>
-      <ItemCreator />
+      <ItemCreator create={item => setItems(items.length, item)} />
       <ItemDisplay items={items} />
     </div>
   )
 }
 
-const ItemCreator: Component = () => {
+const ItemCreator: Component<{ create: (item: Item) => void }> = ({ create }) => {
+  const handleSubmit: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (event) => {
+    event.preventDefault()
+
+    const data = new FormData(event.currentTarget)
+    const date = data.get("date")
+    const start = data.get("start")
+    const end = data.get("end")
+    const notes = data.get("notes")
+    const item: Item = { start: new Date(), end: new Date(), notes: "" }
+
+    if (typeof date === "string") {
+      if (typeof start === "string") item.start = new Date(`${date}T${start}`) // TODO: can date creation throw errors?
+      if (typeof end === "string") item.end = new Date(`${date}T${end}`) // TODO: do something if end <= start
+    }
+
+    if (typeof notes === "string") item.notes = notes // TODO: should notes be processed? maybe at least trim whitespace? 
+
+    create(item)
+
+    event.currentTarget.reset()
+  }
+
   return (
-    <form class={styles.ItemCreator}>
+    <form class={styles.ItemCreator} onSubmit={handleSubmit}>
       <label>
         Date
-        <input type="date" value={toDateInputValue(new Date())} required />
+        {/* attr:value needed, otherwise reset() blanks field instead of setting to "today" */}
+        <input name="date" type="date" attr:value={toDateInputValue(new Date())} required />
       </label>
       <label>
         Start
-        <input type="time" required />
+        <input name="start" type="time" required />
       </label>
       <label>
         End
-        <input type="time" required />
+        <input name="end" type="time" required />
       </label>
       <label class={styles.notes}>
         Notes
-        <input type="text" />
+        <input name="notes" type="text" />
       </label>
-      <button>Create</button>
+      <button type="submit">Create</button>
     </form>
   )
 }
