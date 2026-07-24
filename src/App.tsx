@@ -1,20 +1,14 @@
 import { For, JSX, type Component } from "solid-js"
 
 import styles from "./App.module.css"
-import { createStore } from "solid-js/store"
-
-type Item = {
-  start: Date
-  end: Date
-  notes: string
-}
+import { createItemStore, Item } from "./item-store"
 
 export const App: Component = () => {
-  const [items, setItems] = createStore<Item[]>([])
+  const [items, addItem] = createItemStore()
 
   return (
     <div class={styles.App}>
-      <ItemCreator create={item => setItems(items.length, item)} />
+      <ItemCreator create={addItem} />
       <ItemDisplay items={items} />
     </div>
   )
