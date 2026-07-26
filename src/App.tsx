@@ -56,7 +56,7 @@ const ItemCreator: Component<{ create: (item: Item) => void }> = ({ create }) =>
         Notes
         <input name="notes" type="text" />
       </label>
-      <button type="submit">Create</button>
+      <button class={styles.createButton} type="submit">Create</button>
     </form>
   )
 }
@@ -74,7 +74,8 @@ const ItemDisplay: Component<{ items: Item[] }> = ({ items }) => {
   }
 
   return (
-    <table class={styles.ItemDisplay}>
+    <div class={styles.tableWrapper}>
+      <table class={styles.ItemDisplay}>
       <thead>
         <tr>
           <th>Start</th>
@@ -96,6 +97,7 @@ const ItemDisplay: Component<{ items: Item[] }> = ({ items }) => {
         </For>
       </tbody>
     </table>
+    </div>
   )
 }
 
