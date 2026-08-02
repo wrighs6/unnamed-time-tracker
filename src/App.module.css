@@ -110,7 +110,7 @@
   align-self: flex-end;
   background: #333;
   color: white;
-  border: 1px solid #333;
+  border: none;
   border-radius: 6px;
   padding: 0.4rem 1.25rem;
   font-size: 0.875rem;
@@ -121,5 +121,27 @@
 }
 
 .createButton:hover {
+  background: #555;
+}
+
+.downloadButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: #333;
+  color: white;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.downloadButton:hover {
   background: #555;
 }

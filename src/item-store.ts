@@ -1,5 +1,5 @@
 import { createEffect } from "solid-js"
-import { createStore } from "solid-js/store"
+import { createStore, unwrap } from "solid-js/store"
 import * as z from "zod/mini"
 
 const ItemSchema = z.object({
@@ -19,7 +19,20 @@ export function createItemStore(key: string) {
 
   const addItem = (item: Item) => setItems(items.length, item)
 
-  return [items, addItem] as const
+  const download = () => {
+    const jsonString = JSON.stringify(unwrap(items), null, 2)
+    const url = URL.createObjectURL(new Blob([jsonString], { type: "application/json" }))
+
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `items${Date.now()}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  return [items, addItem, download] as const
 }
 
 function loadStore(key: string): Item[] {

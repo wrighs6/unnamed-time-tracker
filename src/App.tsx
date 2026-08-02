@@ -2,14 +2,16 @@ import { For, JSX, type Component } from "solid-js"
 
 import styles from "./App.module.css"
 import { createItemStore, Item } from "./item-store"
+import { DownloadIcon } from "lucide-solid"
 
 export const App: Component = () => {
-  const [items, addItem] = createItemStore("utt")
+  const [items, addItem, download] = createItemStore("utt")
 
   return (
     <div class={styles.App}>
       <ItemCreator create={addItem} />
       <ItemDisplay items={items} />
+      <button class={styles.downloadButton} onClick={download}><DownloadIcon /></button>
     </div>
   )
 }
@@ -76,27 +78,27 @@ const ItemDisplay: Component<{ items: Item[] }> = ({ items }) => {
   return (
     <div class={styles.tableWrapper}>
       <table class={styles.ItemDisplay}>
-      <thead>
-        <tr>
-          <th>Start</th>
-          <th>End</th>
-          <th>Duration</th>
-          <th>Notes</th>
-        </tr>
-      </thead>
-      <tbody>
-        <For each={items}>
-          {({ start, end, notes }, index) =>
-            <tr>
-              <td>{formatDate(start)}</td>
-              <td>{formatDate(end)}</td>
-              <td>{durationString(start, end)}</td>
-              <td>{notes}</td>
-            </tr>
-          }
-        </For>
-      </tbody>
-    </table>
+        <thead>
+          <tr>
+            <th>Start</th>
+            <th>End</th>
+            <th>Duration</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <For each={items}>
+            {({ start, end, notes }, index) =>
+              <tr>
+                <td>{formatDate(start)}</td>
+                <td>{formatDate(end)}</td>
+                <td>{durationString(start, end)}</td>
+                <td>{notes}</td>
+              </tr>
+            }
+          </For>
+        </tbody>
+      </table>
     </div>
   )
 }
