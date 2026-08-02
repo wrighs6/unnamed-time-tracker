@@ -4,7 +4,7 @@ import styles from "./App.module.css"
 import { createItemStore, Item } from "./item-store"
 
 export const App: Component = () => {
-  const [items, addItem] = createItemStore()
+  const [items, addItem] = createItemStore("utt")
 
   return (
     <div class={styles.App}>
