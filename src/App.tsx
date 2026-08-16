@@ -84,8 +84,7 @@ const ItemCreator: Component<{ create: (item: Item) => void }> = ({ create }) =>
     <form class={styles.itemCreator} onSubmit={handleSubmit}>
       <label class={styles.myLabel}>
         Date
-        {/* attr:value needed, otherwise reset() blanks field instead of setting to "today" */}
-        <input name="date" type="date" attr:value={toDateInputValue(new Date())} required />
+        <input name="date" type="date" required />
       </label>
       <label class={styles.myLabel}>
         Start
