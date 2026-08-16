@@ -152,7 +152,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  margin: 1rem 0;
+  margin-bottom: 1rem;
 }
 
 .cancelButton {
@@ -170,4 +170,51 @@
 
 .cancelButton:hover {
   background: #f0f0f0;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.dialogActions > div {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.deleteButton {
+  background: transparent;
+  color: #b3261e;
+  border: 1px solid #e0b4b0;
+  border-radius: 6px;
+  padding: 0.4rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.deleteButton:hover {
+  background: #fdf0ef;
+}
+
+.confirmButton {
+  background: #b3261e;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.confirmButton:hover {
+  background: #8f1c15;
 }

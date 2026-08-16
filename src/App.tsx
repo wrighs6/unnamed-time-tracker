@@ -4,7 +4,7 @@ import { createItemStore, Item } from "./item-store"
 import styles from "./App.module.css"
 
 export const App: Component = () => {
-  const [items, addItem, updateItem, download] = createItemStore("utt")
+  const [items, addItem, updateItem, deleteItem, download] = createItemStore("utt")
   const [selected, setSelected] = createSignal<number | undefined>(undefined)
   let selectedDialog!: HTMLDialogElement;
 
@@ -24,9 +24,16 @@ export const App: Component = () => {
         onClose={() => setSelected(undefined)}
         closedby="any"
       >
-        {/* Show remounts ItemDetails per open, so edit state resets between visits */}
+        {/* Show remounts ItemDetails per open, so edit/confirm state resets between visits */}
         <Show when={selected() !== undefined}>
-          <ItemDetails item={items[selected() || 0]} update={item => updateItem(selected() || 0, item)} />
+          <ItemDetails
+            item={items[selected() || 0]}
+            update={item => updateItem(selected() || 0, item)}
+            remove={() => {
+              deleteItem(selected() || 0)
+              selectedDialog.close() // onClose then clears `selected`
+            }}
+          />
         </Show>
       </dialog>
     </div>
@@ -121,8 +128,9 @@ const ItemDisplay: Component<{ items: Item[], setSelected: Setter<number | undef
   )
 }
 
-const ItemDetails: Component<{ item: Item, update: (item: Item) => void }> = ({ item, update }) => {
+const ItemDetails: Component<{ item: Item, update: (item: Item) => void, remove: () => void }> = ({ item, update, remove }) => {
   const [editing, setEditing] = createSignal(false)
+  const [confirming, setConfirming] = createSignal(false)
 
   const handleSubmit: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (event) => {
     event.preventDefault()
@@ -167,11 +175,23 @@ const ItemDetails: Component<{ item: Item, update: (item: Item) => void }> = ({ 
           {item.notes}
         </textarea>
       </label>
-      <div class={styles.idRow}>
-        {editing() && (
-          <button class={styles.cancelButton} type="button" onClick={() => setEditing(false)}>Cancel</button>
-        )}
-        <button class={styles.createButton} type="submit">{editing() ? "Save" : "Edit"}</button>
+      <div class={styles.dialogActions}>
+        <div>
+          {confirming() ? (
+            <>
+              <button class={styles.confirmButton} type="button" onClick={() => { remove(); setConfirming(false) }}>Confirm delete</button>
+              <button class={styles.cancelButton} type="button" onClick={() => setConfirming(false)}>Cancel</button>
+            </>
+          ) : (
+            <button class={styles.deleteButton} type="button" onClick={() => setConfirming(true)}>Delete</button>
+          )}
+        </div>
+        <div>
+          {editing() && (
+            <button class={styles.cancelButton} type="button" onClick={() => setEditing(false)}>Cancel</button>
+          )}
+          <button class={styles.createButton} type="submit">{editing() ? "Save" : "Edit"}</button>
+        </div>
       </div>
     </form>
   )

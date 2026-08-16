@@ -21,6 +21,8 @@ export function createItemStore(key: string) {
 
   const updateItem = (index: number, item: Item) => setItems(index, item)
 
+  const deleteItem = (index: number) => setItems(prev => prev.filter((_, i) => i !== index))
+
   const download = () => {
     const jsonString = JSON.stringify(unwrap(items), null, 2)
     const url = URL.createObjectURL(new Blob([jsonString], { type: "application/json" }))
@@ -34,7 +36,7 @@ export function createItemStore(key: string) {
     URL.revokeObjectURL(url)
   }
 
-  return [items, addItem, updateItem, download] as const
+  return [items, addItem, updateItem, deleteItem, download] as const
 }
 
 function loadStore(key: string): Item[] {
