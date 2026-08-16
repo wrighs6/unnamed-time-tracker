@@ -14,6 +14,23 @@ export const App: Component = () => {
     }
   })
 
+  // A modal <dialog> surfaces clicks on its ::backdrop as clicks on the dialog
+  // element itself, while clicks on the content target a descendant. Hit-test
+  // against the dialog's box so we only close when the user clicked the
+  // backdrop (outside the content) — never when a click lands on content.
+  const closeOnBackdropClick: JSX.EventHandler<HTMLDialogElement, MouseEvent> = (event) => {
+    const rect = selectedDialog.getBoundingClientRect()
+    const clickedOutside =
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
+
+    if (clickedOutside) {
+      selectedDialog.close() // onClose then clears `selected`
+    }
+  }
+
   return (
     <div class={styles.app}>
       <ItemCreator create={addItem} />
@@ -22,7 +39,7 @@ export const App: Component = () => {
       <dialog
         ref={selectedDialog}
         onClose={() => setSelected(undefined)}
-        closedby="any"
+        onClick={closeOnBackdropClick}
       >
         {/* Show remounts ItemDetails per open, so edit/confirm state resets between visits */}
         <Show when={selected() !== undefined}>
