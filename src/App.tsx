@@ -1,10 +1,10 @@
-import { createEffect, createSignal, For, JSX, Setter, type Component } from "solid-js"
+import { Show, createEffect, createSignal, For, JSX, Setter, type Component } from "solid-js"
 import { DownloadIcon } from "lucide-solid"
 import { createItemStore, Item } from "./item-store"
 import styles from "./App.module.css"
 
 export const App: Component = () => {
-  const [items, addItem, download] = createItemStore("utt")
+  const [items, addItem, updateItem, download] = createItemStore("utt")
   const [selected, setSelected] = createSignal<number | undefined>(undefined)
   let selectedDialog!: HTMLDialogElement;
 
@@ -24,7 +24,10 @@ export const App: Component = () => {
         onClose={() => setSelected(undefined)}
         closedby="any"
       >
-        <ItemDetails item={items[selected() || 0]} />
+        {/* Show remounts ItemDetails per open, so edit state resets between visits */}
+        <Show when={selected() !== undefined}>
+          <ItemDetails item={items[selected() || 0]} update={item => updateItem(selected() || 0, item)} />
+        </Show>
       </dialog>
     </div>
   )
@@ -102,12 +105,13 @@ const ItemDisplay: Component<{ items: Item[], setSelected: Setter<number | undef
         </thead>
         <tbody>
           <For each={items}>
-            {({ start, end, notes }, index) =>
+            {(item, index) =>
               <tr onClick={() => setSelected(index)}>
-                <td>{formatDate(start)}</td>
-                <td>{formatDate(end)}</td>
-                <td>{durationString(start, end)}</td>
-                <td>{notes}</td>
+                {/* read through the store proxy, NOT destructured locals, so cells re-render on update */}
+                <td>{formatDate(item.start)}</td>
+                <td>{formatDate(item.end)}</td>
+                <td>{durationString(item.start, item.end)}</td>
+                <td>{item.notes}</td>
               </tr>
             }
           </For>
@@ -117,26 +121,59 @@ const ItemDisplay: Component<{ items: Item[], setSelected: Setter<number | undef
   )
 }
 
-const ItemDetails: Component<{ item: Item }> = ({ item }) => {
+const ItemDetails: Component<{ item: Item, update: (item: Item) => void }> = ({ item, update }) => {
+  const [editing, setEditing] = createSignal(false)
+
+  const handleSubmit: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (event) => {
+    event.preventDefault()
+
+    // first press of the button enters edit mode; second press saves.
+    if (!editing()) {
+      setEditing(true)
+      return
+    }
+
+    const data = new FormData(event.currentTarget)
+    const start = data.get("start")
+    const end = data.get("end")
+    const notes = data.get("notes")
+
+    const updated: Item = { start: item.start, end: item.end, notes: item.notes }
+
+    // TODO: same date-parsing robustness questions as ItemCreator (can new Date throw?)
+    if (typeof start === "string") updated.start = new Date(start)
+    if (typeof end === "string") updated.end = new Date(end)
+    if (typeof notes === "string") updated.notes = notes
+
+    update(updated)
+    setEditing(false)
+  }
+
   return (
-    <div>
+    <form onSubmit={handleSubmit}>
       <div class={styles.idRow}>
         <label class={styles.myLabel}>
           Start
-          <input name="start" type="datetime-local" required disabled value={toDateTimeInputValue(item.start)} />
+          <input name="start" type="datetime-local" required disabled={!editing()} value={toDateTimeInputValue(item.start)} />
         </label>
         <label class={styles.myLabel}>
           End
-          <input name="end" type="datetime-local" required disabled value={toDateTimeInputValue(item.end)} />
+          <input name="end" type="datetime-local" required disabled={!editing()} value={toDateTimeInputValue(item.end)} />
         </label>
       </div>
       <label class={styles.myLabel}>
         Notes
-        <textarea name="notes" required disabled>
+        <textarea name="notes" disabled={!editing()}>
           {item.notes}
         </textarea>
       </label>
-    </div>
+      <div class={styles.idRow}>
+        {editing() && (
+          <button class={styles.cancelButton} type="button" onClick={() => setEditing(false)}>Cancel</button>
+        )}
+        <button class={styles.createButton} type="submit">{editing() ? "Save" : "Edit"}</button>
+      </div>
+    </form>
   )
 }
 
