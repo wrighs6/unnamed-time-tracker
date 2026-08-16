@@ -1,5 +1,5 @@
 import { createEffect } from "solid-js"
-import { createStore, unwrap } from "solid-js/store"
+import { createStore } from "solid-js/store"
 import * as z from "zod/mini"
 
 const ItemSchema = z.object({
@@ -24,7 +24,13 @@ export function createItemStore(key: string) {
   const deleteItem = (index: number) => setItems(prev => prev.filter((_, i) => i !== index))
 
   const download = () => {
-    const jsonString = JSON.stringify(unwrap(items), null, 2)
+    // jq's fromdateiso8601 can't parse fractional seconds, so export start/end without them
+    const exported = items.map(({ start, end, notes }) => ({
+      start: stripMilliseconds(start),
+      end: stripMilliseconds(end),
+      notes,
+    }))
+    const jsonString = JSON.stringify(exported, null, 2)
     const url = URL.createObjectURL(new Blob([jsonString], { type: "application/json" }))
 
     const a = document.createElement("a")
@@ -52,4 +58,8 @@ function loadStore(key: string): Item[] {
     console.error("failed to load items from localStorage:", error)
     return []
   }
+}
+
+function stripMilliseconds(date: Date): string {
+  return date.toISOString().replace(/\.\d{3}Z$/, "Z")
 }
